@@ -1,26 +1,22 @@
-import React, {useContext } from "react";
-import { AuthContext } from '../context/AuthProvider';
-// import { auth } from "../service/firebase";
-// import { onAuthStateChanged } from "firebase/auth";
+import React, { useContext } from "react";
+import { AuthContext } from "../context/AuthProvider";
 
 const Home = () => {
-    const value = useContext(AuthContext);
-// const [currentUser, setCurrentUser] = useState(null);
+  const value = useContext(AuthContext);
 
-    // useEffect(() => {
-    //     // onAuthStateChanged(auth,(user) => {
-    //     //     if (user) {
-    //     //         setCurrentUser(user.uid);
-    //     //         console.log(user);
-    //     //     }else{
-    //     //         setCurrentUser(null);
-    //     //     }
-    //     // }) 
-    // }, [currentUser]);
-    console.log(value.userName)
-    return (
-        <div>Home{value.userName}</div>
-    )
-}
+  const btnSign = () => {
+    if (!value[0]) {
+      return <>サインインしてない</>;
+    }
+    return <>サインインしてる</>;
+  };
+
+  return (
+    <>
+      <div>Home</div>
+      {btnSign()}
+    </>
+  );
+};
 
 export default Home;
