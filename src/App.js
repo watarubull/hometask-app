@@ -5,6 +5,7 @@ import Home from "./page/Home";
 import SignUp from "./components/SignUp";
 import SignIn from "./components/SignIn";
 import Mypage from "./page/Mypage";
+import Shopping from "./page/Shopping";
 import { MypageCurrent } from "./context/MypageCurrent";
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
                 <Route path="/mypage" element={<Mypage />} />
                 <Route path="/signup" element={<SignUp />} />
                 <Route path="/signin" element={<SignIn />} />
+                <Route path="/shoppinglist" element={<Shopping />} />
               </Routes>
             </div>
           </main>

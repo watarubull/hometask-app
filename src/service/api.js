@@ -1,6 +1,12 @@
 import { db } from "./firebase";
-import { doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
-import { getAuth, updateEmail, updatePassword } from "firebase/auth";
+import {
+  doc,
+  setDoc,
+  getDoc,
+  updateDoc,
+  addDoc,
+  collection,
+} from "firebase/firestore";
 
 export const addUsers = async (data, groupid, id01) => {
   await setDoc(doc(db, "users", id01), {
@@ -49,4 +55,12 @@ export const updateUserName = async (user, uid, pass) => {
       name: user.name,
     });
   }
+};
+
+export const setItems = async (item, id) => {
+  await addDoc(collection(db, "items"), {
+    itemName: item,
+    groupId: id,
+    status: 0,
+  });
 };
