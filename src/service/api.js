@@ -6,6 +6,10 @@ import {
   updateDoc,
   addDoc,
   collection,
+  query,
+  onSnapshot,
+  where,
+  getDocs,
 } from "firebase/firestore";
 
 export const addUsers = async (data, groupid, id01) => {
@@ -13,7 +17,6 @@ export const addUsers = async (data, groupid, id01) => {
     uid: id01,
     name: data.name01,
     email: data.mail01,
-    group: data.group,
     groupId: groupid,
     password: data.password,
   });
@@ -26,12 +29,10 @@ export const addUsers = async (data, groupid, id01) => {
   //     groupId: groupid,
   //     password: data.password
   // });
-  // await setDoc(doc(db, "group", groupid), {
-  //     groupId: groupid,
-  //     name: data.group,
-  //     memberName: {memberName01: data.name01,memberName02:data.name02},
-  //     memberId: {memberId01: id01,memberId02:id02}
-  // });
+  await setDoc(doc(db, "group", groupid), {
+    groupId: groupid,
+    groupName: data.group,
+  });
 };
 
 export const readUsers = async (uid) => {
@@ -39,13 +40,15 @@ export const readUsers = async (uid) => {
   const docSnap = await getDoc(docRef);
 
   if (docSnap.exists()) {
-    return docSnap.data();
+    const docElm = doc(db, "group", docSnap.data().groupId);
+    const docElmSnap = await getDoc(docElm);
+    return { userData: docSnap.data(), groupData: docElmSnap.data() };
   } else {
     console.log("no data");
   }
 };
 
-export const updateUserName = async (user, uid, pass) => {
+export const updateUserName = async (user, uid) => {
   const docRef = doc(db, "users", uid);
   // const credential = await auth.EmailAuthProvider.credencial(user.email, pass);
   // console.log(credential);
@@ -57,10 +60,46 @@ export const updateUserName = async (user, uid, pass) => {
   }
 };
 
+export const updateGroupName = async (groupName, groupId) => {
+  const docRef = doc(db, "group", groupId);
+  // const credential = await auth.EmailAuthProvider.credencial(user.email, pass);
+  // console.log(credential);
+
+  if (groupName.group) {
+    await updateDoc(docRef, {
+      groupName: groupName.group,
+    });
+  }
+};
+
 export const setItems = async (item, id) => {
-  await addDoc(collection(db, "items"), {
-    itemName: item,
-    groupId: id,
-    status: 0,
+  let flag = true;
+
+  const itemRef = collection(db, "items");
+  const q = query(
+    itemRef,
+    where("itemName", "==", item),
+    where("groupId", "==", id)
+  );
+  const querySnapshot = await getDocs(q);
+  querySnapshot.forEach(async (item) => {
+    await setDoc(doc(db, "items", item.data().groupId), {
+      status: 0,
+    });
+    console.log(item.data().groupId);
+    flag = false;
+  });
+  if (flag) {
+    await addDoc(collection(db, "items"), {
+      itemName: item,
+      groupId: id,
+      status: 0,
+    });
+  }
+};
+
+export const getUser = (uid) => {
+  const unsub = onSnapshot(doc(db, "users", uid), (doc) => {
+    console.log(doc.data());
   });
 };

@@ -26,59 +26,49 @@ const SignUp = () => {
 
   return (
     <>
-      <h1>ユーザ登録</h1>
-      <div>
-        <p>グループ名</p>
-        <input
-          name="group"
-          type="text"
-          onChange={onInputChange}
-          value={inputs.group || ""}
-        />
-        <p>メンバー1</p>
-        <input
-          name="name01"
-          type="text"
-          placeholder="名前"
-          onChange={onInputChange}
-          value={inputs.name01 || ""}
-        />
-        <input
-          name="mail01"
-          type="email"
-          placeholder="メールアドレス"
-          onChange={onInputChange}
-          value={inputs.mail01 || ""}
-        />
-        {/* <p>メンバー2</p>
-                <input
-                    name="name02"
-                    type="text"
-                    placeholder="名前"
-                    onChange={onInputChange}
-                    value={inputs.name02 || ''}
-                />
-                <input
-                    name="mail02"
-                    type="email"
-                    placeholder="メールアドレス"
-                    onChange={onInputChange}
-                    value={inputs.mail02 || ''}
-                /> */}
-        <p>パスワード</p>
-        <input
-          name="password"
-          type="password"
-          placeholder="共通パスワード"
-          onChange={onInputChange}
-          value={inputs.password || ""}
-        />
-        <p>
-          <button type="button" onClick={() => register()}>
-            登録
-          </button>
-        </p>
-      </div>
+      <dl className="input-area">
+        <dt className="title">グループ名</dt>
+        <dd className="item">
+          <input
+            name="group"
+            type="text"
+            onChange={onInputChange}
+            value={inputs.group || ""}
+          />
+        </dd>
+        <dt className="title">ユーザー</dt>
+        <dd className="item">
+          <input
+            name="name01"
+            type="text"
+            placeholder="名前"
+            onChange={onInputChange}
+            value={inputs.name01 || ""}
+          />
+          <input
+            name="mail01"
+            type="email"
+            placeholder="メールアドレス"
+            onChange={onInputChange}
+            value={inputs.mail01 || ""}
+          />
+        </dd>
+        <dt className="title">パスワード</dt>
+        <dd className="item">
+          <input
+            name="password"
+            type="password"
+            placeholder="共通パスワード"
+            onChange={onInputChange}
+            value={inputs.password || ""}
+          />
+        </dd>
+      </dl>
+      <p className="submit">
+        <button type="button" onClick={() => register()}>
+          登録
+        </button>
+      </p>
     </>
   );
 };

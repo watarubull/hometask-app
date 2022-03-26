@@ -1,6 +1,8 @@
 import React, { useContext, useState, useCallback, useEffect } from "react";
 import { AuthContext } from "../context/AuthProvider";
 import * as Api from "../service/api";
+import { db } from "../service/firebase";
+import { doc, onSnapshot } from "firebase/firestore";
 
 const UserInfo = () => {
   let value = useContext(AuthContext);
@@ -9,7 +11,23 @@ const UserInfo = () => {
   const [alertText, setAlertText] = useState("coution!");
   const [inputs, setInputs] = useState({});
 
+  const [userdata, setUserdata] = useState();
+
+  // useEffect(() => {
+  //   if (value[0] === null || value[1] === null) {
+  //     return;
+  //   }
+  //   // const unsub = onSnapshot(doc(db, "users", value.uid), (doc) => {
+  //   //   console.log(doc.data());
+  //   //   setUserdata(doc.data());
+  //   // });
+  //   // const test = Api.getUser(value.uid);
+  // }, [value]);
+
   useEffect(() => {
+    if (value[0] === null || value[1] === null) {
+      return;
+    }
     setInputs({
       name: value[0].name,
       email: value[0].email,
@@ -20,7 +38,7 @@ const UserInfo = () => {
   async function getUser(id) {
     const info = await Api.readUsers(id);
     setInputs(info);
-    value[0] = info;
+    value = info;
   }
 
   const changeForm = () => {
@@ -88,18 +106,21 @@ const UserInfo = () => {
   };
 
   const myInfo = () => {
+    if (value[0] === null || value[1] === null) {
+      return;
+    }
     if (change) {
       return (
         <>
           <dl className="info-list">
             <div className="flex">
               <dt>ユーザー名</dt>
-              <dd>{inputs.name}</dd>
+              <dd>{value[0].name}</dd>
               <dd className="change-btn">{btnSet()}</dd>
             </div>
             <div>
               <dt>メールアドレス</dt>
-              <dd>{inputs.email}</dd>
+              <dd>{value[0].email}</dd>
             </div>
             <div>
               <dt>パスワード</dt>

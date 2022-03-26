@@ -1,16 +1,14 @@
 import React, { useContext, useEffect, useState } from "react";
 import ChildHeader from "../components/ChildHeader";
+import GroupInfo from "../components/GroupInfo";
 // import { Link } from "react-router-dom";
 import UserInfo from "../components/UserInfo";
 import { MypageContext } from "../context/MypageCurrent";
+import * as Api from "../service/api";
 
 const Mypage = () => {
   // const [pegeTransition, setPageTransition] = useState("default");
   const nowMypage = useContext(MypageContext);
-
-  // useEffect(() => {
-  //   console.log(nowMypage.value.mypageCurrent);
-  // });
 
   const changePage = (value) => {
     nowMypage.value.setMypageCurrent(value);
@@ -18,10 +16,15 @@ const Mypage = () => {
 
   const defaultPage = () => {
     return (
-      <ul className="page-list">
-        <li>
+      <ul className="home-list">
+        <li className="list-item">
           <button type="button" onClick={() => changePage("user")}>
             ユーザー情報
+          </button>
+        </li>
+        <li className="list-item">
+          <button type="button" onClick={() => changePage("group")}>
+            グループ情報
           </button>
         </li>
       </ul>
@@ -34,6 +37,13 @@ const Mypage = () => {
       <div className="mypage">
         <ChildHeader links="default" />
         <UserInfo />
+      </div>
+    );
+  } else if (nowMypage.value.mypageCurrent === "group") {
+    return (
+      <div className="mypage">
+        <ChildHeader links="default" />
+        <GroupInfo />
       </div>
     );
   }

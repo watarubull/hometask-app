@@ -13,7 +13,7 @@ import { AuthContext } from "../context/AuthProvider";
 import * as Api from "../service/api";
 import { Link } from "react-router-dom";
 
-const Shopping = () => {
+const ShoppingDone = () => {
   const [popup, setPupup] = useState(false);
   const [popupCh, setPupupCh] = useState("add");
   const [doneBtn, setDoneBtn] = useState(false);
@@ -31,7 +31,7 @@ const Shopping = () => {
     const q = query(
       collection(db, "items"),
       where("groupId", "==", `${value[1].groupId}`),
-      where("status", "==", 0)
+      where("status", "==", 1)
     );
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       let itemsElem = [];
@@ -94,11 +94,7 @@ const Shopping = () => {
   };
 
   const changePopup = (setting) => {
-    if (setting === "add") {
-      setPupupCh("add");
-    } else if (setting === "update") {
-      setPupupCh("update");
-    }
+    setPupupCh(setting);
     setPupup(!popup);
   };
 
@@ -113,8 +109,50 @@ const Shopping = () => {
     if (inputs.itemName !== "") {
       await Api.setItems(inputs.itemName, value[1].groupId);
       changePopup();
-      setInputs({});
       // getList();
+    }
+  };
+
+  const done = async () => {
+    if (checkedSwitch) {
+      let sendList = [];
+      Object.keys(checked).forEach((obj) => {
+        if (checked[obj]) {
+          sendList.push(obj);
+        }
+      });
+      const batch = writeBatch(db);
+      sendList.forEach((item) => {
+        const sfRef = doc(db, "items", item);
+        batch.update(sfRef, {
+          status: 0,
+        });
+      });
+      await batch.commit();
+      // getList();
+      changePopup();
+    }
+  };
+
+  const deleat = async () => {
+    console.log("deleatする！");
+    if (checkedSwitch) {
+      let deleatList = [];
+      Object.keys(checked).forEach((obj) => {
+        if (checked[obj]) {
+          deleatList.push(obj);
+        }
+      });
+      const batch = writeBatch(db);
+      deleatList.forEach((item) => {
+        const sfRef = doc(db, "items", item);
+        batch.update(sfRef, {
+          status: 2,
+        });
+      });
+      await batch.commit();
+      // getList();
+      changePopup();
     }
   };
 
@@ -127,7 +165,6 @@ const Shopping = () => {
               type="text"
               placeholder="品目"
               name="itemName"
-              value={inputs.itemName || ""}
               onChange={onInputChange}
             />
             <button className="btn-add" type="button" onClick={() => addList()}>
@@ -165,7 +202,7 @@ const Shopping = () => {
           <div className="alert-inner list-add">
             {showItems}
             <p className="permission">
-              上記のアイテムを「買ったよ！」にしますか？
+              上記のアイテムを買い物リストに追加にしますか？
             </p>
             <button
               className={`btn-done ${doneBtn ? "able" : ""}`}
@@ -181,28 +218,43 @@ const Shopping = () => {
           </div>
         </div>
       );
-    }
-  };
-
-  const done = async () => {
-    if (checkedSwitch) {
-      let sendList = [];
-      Object.keys(checked).forEach((obj) => {
-        if (checked[obj]) {
-          sendList.push(obj);
+    } else if (setting === "deleate") {
+      const setItems = [];
+      Object.keys(checked).forEach((elm) => {
+        if (checked[elm]) {
+          itemList.forEach((item) => {
+            if (elm === item.id) {
+              setItems.push(item.data.itemName);
+            }
+          });
         }
       });
-      console.log(sendList);
-      const batch = writeBatch(db);
-      sendList.forEach((item) => {
-        const sfRef = doc(db, "items", item);
-        batch.update(sfRef, {
-          status: 1,
-        });
+      const showItems = setItems.map((item) => {
+        return (
+          <div className="list-item" key={item}>
+            {item}
+          </div>
+        );
       });
-      await batch.commit();
-      // getList();
-      changePopup();
+      return (
+        <div className="alert-body">
+          <div className="alert-inner list-add">
+            {showItems}
+            <p className="permission">上記のアイテムを削除しますか？</p>
+            <button
+              className={`btn-done ${doneBtn ? "able" : ""}`}
+              onClick={() => deleat()}
+            >
+              はい
+            </button>
+            <button
+              type="button"
+              className="btn-close"
+              onClick={() => changePopup()}
+            ></button>
+          </div>
+        </div>
+      );
     }
   };
 
@@ -214,21 +266,24 @@ const Shopping = () => {
         </button>
       </div>
       <div className="tab-wrap">
-        <div className="tab current">お買い物リスト</div>
         <button className="tab" type="button">
-          <Link to="/donelist">買ったよリスト</Link>
+          <Link to="/shoppinglist">お買い物リスト</Link>
         </button>
+        <div className="tab current">買ったよリスト</div>
       </div>
       <div className="list-wrap">{setList()}</div>
       <div className="btn-wrap">
-        <button className="btn-add" onClick={() => changePopup("add")}>
-          追加する
+        <button
+          className={`btn-deleat ${doneBtn ? "able" : ""}`}
+          onClick={() => changePopup("deleate")}
+        >
+          リストから削除
         </button>
         <button
           className={`btn-done ${doneBtn ? "able" : ""}`}
           onClick={() => changePopup("update")}
         >
-          買ったよ！
+          買い物リストに追加
         </button>
       </div>
       <div className={`alert-wrap ${popup ? "open" : ""}`}>
@@ -238,4 +293,4 @@ const Shopping = () => {
   );
 };
 
-export default Shopping;
+export default ShoppingDone;

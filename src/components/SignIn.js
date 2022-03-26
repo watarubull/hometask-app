@@ -21,30 +21,33 @@ const SignIn = () => {
   };
   return (
     <>
-      <div>SignIn</div>
-      <div>
-        <p>メールアドレス</p>
-        <input
-          name="email"
-          type="email"
-          placeholder="メールアドレス"
-          onChange={onInputChange}
-          value={inputs.email || ""}
-        />
-        <p>パスワード</p>
-        <input
-          name="password"
-          type="password"
-          placeholder="共通パスワード"
-          onChange={onInputChange}
-          value={inputs.password || ""}
-        />
-        <p>
-          <button type="button" onClick={() => register()}>
-            サインイン
-          </button>
-        </p>
-      </div>
+      <dl className="input-area">
+        <dt className="title">メールアドレス</dt>
+        <dd className="item">
+          <input
+            name="email"
+            type="email"
+            placeholder="メールアドレス"
+            onChange={onInputChange}
+            value={inputs.email || ""}
+          />
+        </dd>
+        <dt className="title">パスワード</dt>
+        <dd className="item">
+          <input
+            name="password"
+            type="password"
+            placeholder="共通パスワード"
+            onChange={onInputChange}
+            value={inputs.password || ""}
+          />
+        </dd>
+      </dl>
+      <p className="submit">
+        <button type="button" onClick={() => register()}>
+          サインイン
+        </button>
+      </p>
     </>
   );
 };
