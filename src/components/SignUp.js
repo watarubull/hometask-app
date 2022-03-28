@@ -8,7 +8,6 @@ const SignUp = () => {
   const [inputs, setInputs] = useState({});
 
   const register = async () => {
-    console.log(inputs);
     const initialState = shortid.generate();
     await createUserWithEmailAndPassword(auth, inputs.mail01, inputs.password);
     const user01 = auth.currentUser.uid;

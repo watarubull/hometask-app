@@ -677,3 +677,32 @@ a:visited {
     line-height: 1.2;
   }
 }
+.join-area {
+  .message {
+    margin-bottom: 1em;
+    text-align: center;
+  }
+  .join-inner {
+    padding: 16px;
+    background-color: $colorYellow;
+    border-radius: 16px;
+  }
+}
+
+.send-invitation {
+  text-align: center;
+  input {
+    display: block;
+    width: 280px;
+    margin-top: 1em;
+  }
+  a {
+    display: block;
+    padding: 1em;
+    margin-top: 1em;
+    font-size: 14px;
+    font-weight: bold;
+    color: $white;
+    background-color: $colorGreen;
+  }
+}

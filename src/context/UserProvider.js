@@ -23,17 +23,21 @@ export const UserProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(doc(db, "users", user.uid), (userDoc) => {
-      setUserPram(userDoc.data());
-      onSnapshot(doc(db, "group", userDoc.data().groupId), (groupDoc) => {
-        setGroupPram(groupDoc.data());
-        setLoading(false);
+    if (user) {
+      const unsubscribe = onSnapshot(doc(db, "users", user.uid), (userDoc) => {
+        setUserPram(userDoc.data());
+        onSnapshot(doc(db, "group", userDoc.data().groupId), (groupDoc) => {
+          setGroupPram(groupDoc.data());
+          setLoading(false);
+        });
       });
-    });
-    return () => {
-      unsubscribe();
-    };
-  }, [user.uid]);
+      return () => {
+        unsubscribe();
+      };
+    } else {
+      setLoading(false);
+    }
+  }, [user]);
 
   return (
     <UserContext.Provider value={value}>

@@ -1,19 +1,20 @@
-import React, { useState, useCallback, useContext, useEffect } from "react";
 import {
   writeBatch,
-  doc,
-  getDocs,
   collection,
+  onSnapshot,
   query,
   where,
-  onSnapshot,
+  doc,
 } from "firebase/firestore";
-import { db } from "../service/firebase";
-import { AuthContext } from "../context/AuthProvider";
-import * as Api from "../service/api";
+import React, { useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
+import { useInfo } from "../context/UserProvider";
+import { db } from "../service/firebase";
+import * as Api from "../service/api";
 
 const Shopping = () => {
+  const { groupPram } = useInfo();
+
   const [popup, setPupup] = useState(false);
   const [popupCh, setPupupCh] = useState("add");
   const [doneBtn, setDoneBtn] = useState(false);
@@ -22,33 +23,26 @@ const Shopping = () => {
   const [checked, setChecked] = useState({});
   const [checkedSwitch, setCheckedSwitch] = useState(false);
 
-  const value = useContext(AuthContext);
-
+  //買い物リストの取得・表示
   useEffect(() => {
-    if (value[0] === null || value[1] === null) {
-      return;
-    }
     const q = query(
       collection(db, "items"),
-      where("groupId", "==", `${value[1].groupId}`),
+      where("groupId", "==", `${groupPram.groupId}`),
       where("status", "==", 0)
     );
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      let itemsElem = [];
+      let itemElem = [];
       querySnapshot.forEach((doc) => {
-        itemsElem.push({ id: doc.id, data: doc.data() });
+        itemElem.push({ id: doc.id, data: doc.data() });
       });
-      setItemList(itemsElem);
+      setItemList(itemElem);
     });
     return () => {
       unsubscribe();
     };
-  }, [value]);
+  }, [groupPram]);
 
   useEffect(() => {
-    if (value[0] === null || value[1] === null) {
-      return;
-    }
     function checkList() {
       const search = Object.keys(checked).some(
         (item) => checked[item] === true
@@ -62,16 +56,15 @@ const Shopping = () => {
       }
     }
     checkList();
-  }, [checked, value]);
+  }, [checked]);
 
   const checkBtn = (e) => {
-    let targetId = e.target.id;
-    setChecked({ ...checked, [targetId]: e.target.checked });
+    setChecked({ ...checked, [e.target.id]: e.target.checked });
   };
 
   const setList = () => {
     if (itemList.length > 0) {
-      const list = itemList.map((item, index) => {
+      const list = itemList.map((item) => {
         return (
           <div key={item.id} id={item.id}>
             <label>
@@ -94,11 +87,7 @@ const Shopping = () => {
   };
 
   const changePopup = (setting) => {
-    if (setting === "add") {
-      setPupupCh("add");
-    } else if (setting === "update") {
-      setPupupCh("update");
-    }
+    setPupupCh(setting);
     setPupup(!popup);
   };
 
@@ -111,10 +100,9 @@ const Shopping = () => {
 
   const addList = async () => {
     if (inputs.itemName !== "") {
-      await Api.setItems(inputs.itemName, value[1].groupId);
+      await Api.setItems(inputs.itemName, groupPram.groupId);
       changePopup();
       setInputs({});
-      // getList();
     }
   };
 

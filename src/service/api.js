@@ -21,18 +21,20 @@ export const addUsers = async (data, groupid, id01) => {
     password: data.password,
   });
 
-  // await setDoc(doc(db, "users", id02), {
-  //     uid: id02,
-  //     name: data.name02,
-  //     email: data.mail02,
-  //     group: data.group,
-  //     groupId: groupid,
-  //     password: data.password
-  // });
-  await setDoc(doc(db, "group", groupid), {
-    groupId: groupid,
-    groupName: data.group,
+  const itemRef = collection(db, "group");
+  const q = query(itemRef, where("groupId", "==", groupid));
+  const querySnapshot = await getDocs(q);
+  let groupData;
+  querySnapshot.forEach((doc) => {
+    groupData = doc.id;
   });
+
+  if (!groupData) {
+    await setDoc(doc(db, "group", groupid), {
+      groupId: groupid,
+      groupName: data.group,
+    });
+  }
 };
 
 export const readUsers = async (uid) => {
@@ -53,9 +55,9 @@ export const updateUserName = async (user, uid) => {
   // const credential = await auth.EmailAuthProvider.credencial(user.email, pass);
   // console.log(credential);
 
-  if (user.name) {
+  if (user) {
     await updateDoc(docRef, {
-      name: user.name,
+      name: user,
     });
   }
 };
@@ -65,16 +67,14 @@ export const updateGroupName = async (groupName, groupId) => {
   // const credential = await auth.EmailAuthProvider.credencial(user.email, pass);
   // console.log(credential);
 
-  if (groupName.group) {
+  if (groupName) {
     await updateDoc(docRef, {
-      groupName: groupName.group,
+      groupName: groupName,
     });
   }
 };
 
 export const setItems = async (item, id) => {
-  let flag = true;
-
   const itemRef = collection(db, "items");
   const q = query(
     itemRef,
@@ -82,17 +82,18 @@ export const setItems = async (item, id) => {
     where("groupId", "==", id)
   );
   const querySnapshot = await getDocs(q);
-  querySnapshot.forEach(async (item) => {
-    await setDoc(doc(db, "items", item.data().groupId), {
-      status: 0,
-    });
-    console.log(item.data().groupId);
-    flag = false;
+  let itemData;
+  querySnapshot.forEach((doc) => {
+    itemData = doc.id;
   });
-  if (flag) {
+  if (!itemData) {
     await addDoc(collection(db, "items"), {
       itemName: item,
       groupId: id,
+      status: 0,
+    });
+  } else {
+    await updateDoc(doc(db, "items", itemData), {
       status: 0,
     });
   }
